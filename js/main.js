@@ -1,7 +1,7 @@
 $(function() {
     init();
     console.log("Main init called");
-    ParseFen("2kpp/p3p/5/P3P/2KPP 0 4 10 5 14 0");
+    ParseFen("2kpp/p3p/5/P3P/2KPP 10 10 10 10 14 0");
     PrintBoard();
     GenerateMoves();
     PrintMoveList();
@@ -24,6 +24,19 @@ function InitFilesRanksBrd() {
             FilesBrd[sq] = file;
             RanksBrd[sq] = rank;
         }
+    }
+}
+
+function InitHashKeys() {
+    var index = 0;
+    for (index = 0; index < pieceKeys.length; index++) {
+        pieceKeys[index] = RAND_32();
+    }
+
+    SideKey = RAND_32();
+
+    for (index = 0; index < CardKeys.length; index++) {
+        CardKeys[index] = RAND_32();
     }
 }
 
@@ -57,4 +70,5 @@ function init() {
 
     InitFilesRanksBrd();
     initializeSqActualToSqExtended();
+    InitHashKeys();
 }

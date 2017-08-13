@@ -1,6 +1,7 @@
 var PIECES = { EMPTY: 0, wP: 1, wK: 2, bP: 3, bK: 4 };
 var BRD_SQ_NUM = 63;
 var PLAYABLE_BRD_SQ_NUM = 25;
+var NUM_CARDS = 16;
 var FILES = { FILE_A: 0, FILE_B: 1, FILE_C: 2, FILE_D: 3, FILE_E: 4, FILE_NONE: 5 };
 var RANKS = { RANK_1: 0, RANK_2: 1, RANK_3: 2, RANK_4: 3, RANK_5: 4, RANK_NONE: 5 };
 
@@ -13,6 +14,16 @@ var SQUARES = {
 var COLOR = {
     WHITE: 0, BLACK: 1, BOTH: 2,
 }
+
+// unique index for each piece-square combination, so we need an array of size
+// numPieces * num squares
+var pieceKeys = new Array(5 * BRD_SQ_NUM);
+
+// one bit, for who is moving
+var SideKey;
+
+// need one key per card combination. 5 slots, each slot can be one of NUM_CARDS cards
+var CardKeys = new Array(NUM_CARDS * 5)
 
 var MAXGAMEMOVES = 2048;
 var MAXPOSITIONMOVES = 256;
@@ -125,3 +136,22 @@ function CARD(m) { return (m >> 12) & 0x1F; };
 function CAPTURED(m) { return (m >> 17) & 0x07; };
 
 var NOMOVE = 0;
+
+/* 
+ * using Math.random(), which apparently doesn't have enough precision to generate a 32 bit random number,
+ * multiple times with bit shifts to create 32 random bits
+ */
+function RAND_32() {
+    return (Math.floor((Math.random() * 255) + 1) << 23) | (Math.floor((Math.random() * 255) + 1) << 16)
+        | (Math.floor((Math.random() * 255) + 1) << 8) | Math.floor((Math.random() * 255) + 1);
+}
+
+function HASH_PIECE(piece, square) {
+    GameBoard.posKey ^= pieceKeys[(piece * BRD_SQ_NUM) + sq];
+}
+
+function HASH_CARD(cardIndex, cardValue) {
+    GameBoard.posKey ^= CardKeys[(GameBoard.cardsList.length * cardValue) + cardIndex];
+}
+
+function HASH_SIDE() { GameBoard.posKey ^= SideKey }

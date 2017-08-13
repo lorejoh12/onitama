@@ -13,6 +13,11 @@ GameBoard.hisPly = 0;
  */
 GameBoard.ply = 0;
 
+/**
+ * Hash of the position
+ */
+GameBoard.posKey = 0;
+
 
 /**
  * There are 10 possible pieces. White's king, 4 pawns, and black's king, 4 pawns
@@ -82,6 +87,29 @@ function UpdateListsMaterial() {
     }
 
     // PrintPieceLists();
+}
+
+function GeneratePosKey() {
+    var sq = 0, finalKey = 0, piece = PIECES.EMPTY, card = 0, index=0;
+
+    for (sq = 0; sq < BRD_SQ_NUM; sq++) {
+        piece = GameBoard.pieces[sq];
+        if (piece != PIECES.EMPTY && piece != SQUARES.OFFBOARD) {
+            finalKey ^= pieceKeys[(piece * BRD_SQ_NUM) + sq]
+        }
+    }
+
+    // hash in side key if white, otherwise leave as 0 for black
+    if (GameBoard.side == COLOR.WHITE) {
+        finalKey ^= SideKey;
+    }
+
+    for (index = 0; index < GameBoard.cardsList.length; index++) {
+        card = GameBoard.cardsList[index];
+        finalKey ^= CardKeys[(GameBoard.cardsList.length * card) + index];
+    }
+
+    return finalKey;
 }
 
 function ResetBoard() {
