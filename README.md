@@ -1,4 +1,5 @@
 Onitama Javascript engine
+========================
 
 This is a javascript implementation of the board game Onitama. I followed along with Bluefever's "Programming A Chess Engine In Pure Javascript" Youtube code tutorial, making changes as necessary for adapting Onitama's different movement rules.
 
