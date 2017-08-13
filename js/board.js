@@ -81,7 +81,7 @@ function UpdateListsMaterial() {
         }
     }
 
-    PrintPieceLists();
+    // PrintPieceLists();
 }
 
 function ResetBoard() {

@@ -3,9 +3,29 @@
  * @param {*} from 
  * @param {*} to 
  * @param {*} card 
+ * @param {*} captured
  */
-function MOVE(from, to, card) {
-    return from | (to << 6) | (card << 12);
+function MOVE(from, to, card, captured) {
+    return from | (to << 6) | (card << 12) | (captured << 17);
+}
+
+/**
+ * We separate addCaptureMove and addQuietMove because the algorithm will
+ * evaluate their scores differently.
+ * @param {*} move 
+ */
+function AddCaptureMove(move) {
+    var index = GameBoard.moveListStart[GameBoard.ply + 1];
+    GameBoard.moveList[index] = move;
+    GameBoard.moveScores[index] = 0;
+    GameBoard.moveListStart[GameBoard.ply + 1]++;
+}
+
+function AddQuietMove(move) {
+    var index = GameBoard.moveListStart[GameBoard.ply + 1];
+    GameBoard.moveList[index] = move;
+    GameBoard.moveScores[index] = 0;
+    GameBoard.moveListStart[GameBoard.ply + 1]++;
 }
 
 /*
@@ -50,23 +70,30 @@ function GenerateMoves() {
         // grab the current piece for the current player
         var pieceIndex = 1 + GameBoard.side * 5 + i;
         pieceSquare = GameBoard.pieceList[pieceIndex];
+        
+        var movesArr = [moves1, moves2];
+        var cardArr = [card1, card2];
+        for (var k = 0; k < 2; k++) {
+            var mov = movesArr[k];
+            var card = parseInt(cardArr[k]);
 
-        var possibleMoveSquare;
-        // check both cards to see if that card lets that piece attack that square
-        for (var j = 0; j < moves1.length; j++) {
-            possibleMoveSquare = pieceSquare + convertRowColArrayToIndexOffset(moves1[j][0], moves1[j][1], GameBoard.side);
-            // add move? and card.
+            var pieceTaken;
+            var possibleMoveSquare;
+            // check both cards to see if that card lets that piece attack that square
+            for (var j = 0; j < mov.length; j++) {
+                possibleMoveSquare = pieceSquare + convertRowColArrayToIndexOffset(mov[j][0], mov[j][1], GameBoard.side);
+                pieceTaken = GameBoard.pieces[possibleMoveSquare];
+                
+                // piece is capturable if it's a piece of the opposite color
+                capturablePiece = ((pieceTaken == PIECES.bK || pieceTaken == PIECES.bP) && GameBoard.side == COLOR.WHITE) ||
+                    ((pieceTaken == PIECES.wK || pieceTaken == PIECES.wP) && GameBoard.side == COLOR.BLACK);
+                if (pieceTaken == PIECES.EMPTY) {
+                    AddQuietMove(MOVE(pieceSquare, possibleMoveSquare, card, PIECES.EMPTY));
+                }
+                else if (pieceTaken != SQUARES.OFFBOARD && capturablePiece) {
+                    AddCaptureMove(MOVE(pieceSquare, possibleMoveSquare, card, pieceTaken));
+                }
+            }
         }
-
-        for (j = 0; j < moves2.length; j++) {
-            possibleMoveSquare = pieceSquare + convertRowColArrayToIndexOffset(moves2[j][0], moves2[j][1], GameBoard.side);
-        }
-    }
-
-    // console.log('pieceSquare ' + PrSq(sq) + ' is not threatened by player ' + GameBoard.side);
-    return false;
-
-    if (GameBoard.side == COLOR.WHITE) {
-
     }
 }

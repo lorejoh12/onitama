@@ -2,8 +2,9 @@ $(function() {
     init();
     console.log("Main init called");
     ParseFen("2kpp/p3p/5/P3P/2KPP 0 4 10 5 14 0");
-    PrintSqAttacked();    
     PrintBoard();
+    GenerateMoves();
+    PrintMoveList();
 });
 
 function InitFilesRanksBrd() {

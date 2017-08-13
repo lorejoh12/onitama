@@ -107,17 +107,21 @@ when storing moves in onitama, the only important information is:
    which square the piece started from
    which squrae the piece moved to
    which card was used to make the move
+   which piece was captured
 we only have 63 values on extended board = 6 bits to store
 card goes up to 15, but I know there are expansions so I'll use 5 bits for cards
-6+6+5 = 17 bits
+piece captured has 3 bits, only 5 values
+6+6+5+3 = 20 bits
 int is 32 bits
 0000 0000 0000 0000 0000 0000 0011 1111 -> from 0x3F
 0000 0000 0000 0000 0000 1111 1100 0000 -> To >> 6, 0x3F
 0000 0000 0000 0001 1111 0000 0000 0000 -> Card >> 12, 0x1F
+0000 0000 0000 1110 0000 0000 0000 0000 -> Card >> 17, 0x07
 */
 
-function FROMSQ(m) { return (m & 0x7F); }
-function TOSQ(m) { return (m >> 6) & 0x7F; }
+function FROMSQ(m) { return (m & 0x3F); }
+function TOSQ(m) { return (m >> 6) & 0x3F; }
 function CARD(m) { return (m >> 12) & 0x1F; };
+function CAPTURED(m) { return (m >> 17) & 0x07; };
 
 var NOMOVE = 0;
